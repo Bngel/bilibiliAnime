@@ -1,0 +1,157 @@
+from PyQt5.QtWidgets import QWidget,QApplication,QLabel,QLineEdit,QComboBox,QCheckBox
+from PyQt5.QtGui import QPixmap,QPainter,QFont,QFontDatabase,QIcon
+from PyQt5.QtCore import Qt
+import sys
+
+class Choose(QWidget):
+
+    def __init__(self,win_x,win_y):
+        super().__init__()
+        choose_pic_bk_path = './source/pic/Anime_choose_bk.png'
+        hgzy_font_path = './source/font/HGZY_CNKI.TTF'
+        rem_ico_path = './source/pic/rem.png'
+        self.pix = QPixmap(choose_pic_bk_path)
+        self.resize(self.pix.width(), self.pix.height())
+        self.pix = self.pix.scaled(int(self.pix.width()), int(self.pix.height()))
+        self.setMask(self.pix.mask())
+        self.move(win_x,win_y-self.pix.height())
+        self.setWindowFlags(Qt.FramelessWindowHint)  # | QtCore.Qt.WindowStaysOnTopHint
+        self.setAttribute(Qt.WA_TranslucentBackground) # 窗口透明抗锯齿
+        rem_icon = QIcon(QPixmap(rem_ico_path))
+        self.setWindowIcon(rem_icon)
+        fontId = QFontDatabase.addApplicationFont(hgzy_font_path)
+        fontName = QFontDatabase.applicationFontFamilies(fontId)[0]
+        label_start_x = 100
+        label_start_y = 80
+        label_width = self.pix.width()-label_start_x
+        label_height = 100
+        label_between = 50
+        self.animetitle = QLabel(self)
+        self.animetitle.setObjectName('AnimeTitle')
+        self.animetitle.setFont(QFont(fontName,15,QFont.Light))
+        self.animetitle.setGeometry(label_start_x,label_start_y,label_width,label_height)
+        self.animetitle.setStyleSheet("#AnimeTitle{color:#FFFFFF}")
+        self.animetitle.setText('番剧名称:')
+        self.animeorder = QLabel(self)
+        self.animeorder.setObjectName('AnimeOrder')
+        self.animeorder.setFont(QFont(fontName, 15, QFont.Light))
+        self.animeorder.setGeometry(label_start_x, label_start_y + label_between, label_width, label_height)
+        self.animeorder.setStyleSheet("#AnimeOrder{color:#FFFFFF}")
+        self.animeorder.setText('追番人数:')
+        linetext_start_x = label_start_x + 150
+        linetext_start_y = label_start_y + 32
+        linetext_width = 200
+        linetext_height = label_height-65
+        self.titletext = QLineEdit(self)
+        self.titletext.setObjectName('TitleText')
+        self.titletext.setFont(QFont(fontName,12,QFont.Light))
+        self.titletext.setGeometry(linetext_start_x,linetext_start_y,linetext_width,linetext_height)
+        self.titletext.setPlaceholderText('空白则不设置筛选')
+        self.ordertext = QLineEdit(self)
+        self.ordertext.setObjectName('OrderText')
+        self.ordertext.setFont(QFont(fontName, 12, QFont.Light))
+        self.ordertext.setGeometry(linetext_start_x, linetext_start_y+label_between, linetext_width, linetext_height)
+        self.ordertext.setPlaceholderText('空白则不设置筛选')
+        self.animetime = QLabel(self)
+        self.animetime.setObjectName('AnimeTime')
+        self.animetime.setFont(QFont(fontName, 15, QFont.Light))
+        self.animetime.setGeometry(label_start_x, label_start_y + label_between*2, label_width, label_height)
+        self.animetime.setStyleSheet("#AnimeTime{color:#FFFFFF}")
+        self.animetime.setText('番剧季度/时间:')
+        self.animecombo_season = QComboBox(self)
+        self.animecombo_season.setObjectName('AnimeSeason')
+        self.animecombo_season.setFont(QFont(fontName, 15, QFont.Light))
+        self.animecombo_season.setGeometry(label_start_x,label_start_y*2+label_between*2,140,linetext_height + 10)
+        self.animecombo_season.setStyleSheet('#AnimeSeason{color:white;background:#fbde68}')
+        self.animecombo_season.addItem('不筛选')
+        self.animecombo_season.addItem('1月')
+        self.animecombo_season.addItem('4月')
+        self.animecombo_season.addItem('7月')
+        self.animecombo_season.addItem('10月')
+        self.timetext = QLineEdit(self)
+        self.timetext.setObjectName('TimeText')
+        self.timetext.setFont(QFont(fontName, 12, QFont.Light))
+        self.timetext.setGeometry(linetext_start_x, label_start_y*2+label_between*2, linetext_width, linetext_height + 10)
+        self.timetext.setPlaceholderText('年份(例:2020)')
+        self.animevip = QCheckBox(self)
+        self.animevip.setObjectName('AnimeVip')
+        self.animevip.setTristate()
+        self.animevip.setFont(QFont(fontName, 15, QFont.Light))
+        self.animevip.setGeometry(label_start_x, (label_start_y + label_between) * 2 - 20 + label_between, label_width, label_height)
+        self.animevip.setStyleSheet("#AnimeVip{color:#FFFFFF}")
+        self.animevip.setText('番剧无需会员权限')
+        self.animefinish = QCheckBox(self)
+        self.animefinish.setObjectName('AnimeFinish')
+        self.animefinish.setTristate()
+        self.animefinish.setFont(QFont(fontName, 15, QFont.Light))
+        self.animefinish.setGeometry(label_start_x, label_start_y*2 + label_between * 3 - 20 + label_between, label_width, label_height)
+        self.animefinish.setStyleSheet("#AnimeFinish{color:#FFFFFF}")
+        self.animefinish.setText('番剧已完结')
+        self.animetag = QLabel(self)
+        self.animetag.setObjectName('AnimeTag')
+        self.animetag.setFont(QFont(fontName, 15, QFont.Light))
+        self.animetag.setGeometry(label_start_x, label_start_y*2 + label_between*5-20, label_width, label_height)
+        self.animetag.setStyleSheet("#AnimeTag{color:#FFFFFF}")
+        self.animetag.setText('番剧风格:')
+        self.animetags = []
+        for i in range(3):
+            self.animetags.append(QComboBox(self))
+            self.animetags[i].setObjectName('AnimeTags_%d' % i)
+            self.animetags[i].setFont(QFont(fontName, 12, QFont.Light))
+            self.animetags[i].setGeometry(label_start_x - 20 + i * 140, label_start_y * 2 + label_between * 6 + 10, 120,
+                                         linetext_height + 10)
+            self.animetags[i].setStyleSheet('#AnimeTags_%d{color:white;background:#fbde68}' % i)
+            self.animetags[i].addItem('不筛选')
+            self.animetags[i].addItem('原创')
+            self.animetags[i].addItem('漫画改')
+            self.animetags[i].addItem('小说改')
+            self.animetags[i].addItem('游戏改')
+            self.animetags[i].addItem('布袋戏')
+            self.animetags[i].addItem('热血')
+            self.animetags[i].addItem('穿越')
+            self.animetags[i].addItem('奇幻')
+            self.animetags[i].addItem('战斗')
+            self.animetags[i].addItem('搞笑')
+            self.animetags[i].addItem('日常')
+            self.animetags[i].addItem('科幻')
+            self.animetags[i].addItem('萌系')
+            self.animetags[i].addItem('治愈')
+            self.animetags[i].addItem('校园')
+            self.animetags[i].addItem('少儿')
+            self.animetags[i].addItem('泡面')
+            self.animetags[i].addItem('恋爱')
+            self.animetags[i].addItem('少女')
+            self.animetags[i].addItem('魔法')
+            self.animetags[i].addItem('冒险')
+            self.animetags[i].addItem('历史')
+            self.animetags[i].addItem('架空')
+            self.animetags[i].addItem('机战')
+            self.animetags[i].addItem('神魔')
+            self.animetags[i].addItem('声控')
+            self.animetags[i].addItem('运动')
+            self.animetags[i].addItem('励志')
+            self.animetags[i].addItem('音乐')
+            self.animetags[i].addItem('推理')
+            self.animetags[i].addItem('社团')
+            self.animetags[i].addItem('智斗')
+            self.animetags[i].addItem('催泪')
+            self.animetags[i].addItem('美食')
+            self.animetags[i].addItem('偶像')
+            self.animetags[i].addItem('乙女')
+            self.animetags[i].addItem('职场')
+        self.ret = QLabel(self)
+        self.ret.setObjectName('AnimeRet')
+        self.ret.setFont(QFont(fontName, 9, QFont.Light))
+        self.ret.setGeometry(label_start_x + label_between + 15, label_start_y*2 + label_between*6+27, label_width, label_height)
+        self.ret.setStyleSheet("#AnimeRet{color:#e368b9}")
+        self.ret.setText('<<关闭本窗口即可保存>>')
+
+    def paintEvent(self, event):
+        paint = QPainter(self)
+        paint.drawPixmap(0,0,self.pix.width(),self.pix.height(),self.pix)
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = Choose(1419,1187)
+    win.show()
+    sys.exit(app.exec_())
